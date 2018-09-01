@@ -1,5 +1,4 @@
-﻿# ! /usr/bin/env python
-#
+﻿#
 # Copyright 2009 Facebook
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -28,9 +27,10 @@ import itertools
 import os
 import time
 import threading
-from pyLease.pyLease.utils.log_handle import init_logging
+# from .log_handle import init_logging
+import logging
 
-logger = init_logging()
+logger = logging.getLogger(__name__)
 mutex = threading.Lock()
 
 try:

@@ -4,8 +4,10 @@
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-
+import base64
+from random import choice
 from scrapy import signals
+from settings import USER_AGENTS, PROXIES
 
 
 class PyleaseSpiderMiddleware(object):
@@ -101,3 +103,36 @@ class PyleaseDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class PylenseUserAgentMiddleware(object):
+
+    def process_request(self, request, spider):
+        # Called for each request that goes through the downloader
+        # middleware.
+
+        # Must either:
+        # - return None: continue processing this request
+        # - or return a Response object
+        # - or return a Request object
+        # - or raise IgnoreRequest: process_exception() methods of
+        #   installed downloader middleware will be called
+        user_agent = choice(USER_AGENTS)
+        request.headers.setdefault("User-Agent", user_agent)
+
+
+class PylenseProxyMiddleware(object):
+
+    def process_request(self, request, spider):
+
+        proxy = choice(PROXIES)
+
+        if proxy['user_password'] is None:
+            # 没有代理账户验证的代理使用方式
+            request.meta['proxy'] = "http://" + proxy['ip_port']
+        else:
+            # 对账户密码进行base64编码转换
+            base64_user_password = base64.b64encode(proxy['user_password'])
+            # 对应到代理服务器的信令格式里
+            request.headers['Proxy-Authorization'] = 'Basic ' + base64_user_password
+            request.meta['proxy'] = "http://" + proxy['ip_port']

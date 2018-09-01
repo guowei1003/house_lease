@@ -4,7 +4,7 @@ import yaml
 import logging
 import logging.config
 
-from pyLease.pyLease.settings import LOCAL_LOG_DIR
+from ..settings import LOCAL_LOG_DIR
 
 
 def init_logging(path="./logging.yaml", level=logging.INFO):
@@ -18,6 +18,6 @@ def init_logging(path="./logging.yaml", level=logging.INFO):
         logging.config.dictConfig(log_config)
     else:
         logging.basicConfig(level=level)
-    logger = logging.getLogger()
-    logger.info("初始化logging完成")
-    return logger
+    # logger = logging.getLogger()
+    # logger.info("初始化logging完成")
+    # return logger

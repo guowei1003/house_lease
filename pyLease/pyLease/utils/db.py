@@ -1,13 +1,13 @@
 # coding:utf-8
 
+import logging
 import threading
-from pyLease.pyLease.utils.database import Connection
-from pyLease.pyLease.utils.log_handle import init_logging
-from pyLease.pyLease.settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
+from database import Connection
+from ..settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 
 con = None
 mutex = threading.Lock()
-logger = init_logging()
+logger = logging.getLogger(__name__)
 
 
 def connect():
@@ -20,7 +20,7 @@ def connect():
         return con
 
     con = Connection(MYSQL_HOST, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD, time_zone="+8:00", mutex=mutex)
-    logger.info("启动MySQL")
+    logger.info(u"启动MySQL")
     return con
 
 
