@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import re
+import time
 import logging
 from scrapy import Request
 from scrapy.selector import Selector
@@ -13,31 +15,94 @@ logger = logging.getLogger(__name__)
 class Data58Spider(CrawlSpider):
     name = 'data_58'
     allowed_domains = ['58.com']
-    start_urls = [u'http://www.58.com/changecity.html']
+    start_urls = [u'http://bj.58.com/chuzu']
+
+    re_content = re.compile(r'jxjump\.58\.com/service\?target=.*')
+    re_content_1 = re.compile(r'short\.58\.com/zd_p/.*/\?target=.*')
+    re_content_2 = re.compile(r'.*\.58\.com/hezu/\d*x\.shtml.*')
+    re_content_3 = re.compile(r'.*\.58\.com/zufang/\d*x\.shtml.*')
+    re_content_4 = re.compile(r'legoclick\.58\.com/cpaclick.*')
+    re_hunter = re.compile(r'.*\.58\.com/chuzu/pn[\d]{1,10}/$')
 
     rules = (
-        Rule(Sle(allow=(r'.*58\.com.*')), callback="hunter_parse", follow=False),
+        Rule(Sle(allow=(re_content, re_content_2, re_content_3, re_content_4)), callback="content_parse"),
+        Rule(Sle(allow=(re_hunter,)), callback="hunter_parse", follow=True),
+        Rule(Sle(allow=(r'.+',)), callback="drop_parse"),
+        Rule(Sle(allow=(r'.*',)), callback="drop_parse"),
     )
 
     def hunter_parse(self, response):
-        logger.info("Start Hunter=====================================================")
+        logger.info(u">>> Start Hunter <<<")
 
-        response_body = Selector(response=response)
-        hot_url = response_body.css('.hot-city').xpath('@href').extract()
-        recommend_url = response_body.css('.recommend-city').xpath('@href').extract()
-        content_url = response_body.css('.content-city').xpath('@href').extract()
-        print("---------------------")
-        print(hot_url)
-        print(recommend_url)
-        print(content_url)
-        print("---------------------")
+        # response_body = Selector(response=response)
+
+        print(u"爬到新链接>>>", response.url)
 
     def content_parse(self, response):
-        Item = []
-        response_body = Selector(response=response)
+        logger.info(u">>> Start Content <<<")
 
-    def parse_start_url(self, response):
-        logger.info(">>> Start Hunter <<<")
+        current_timestamp = time.time()
+
+        Item = []
+        requestItem = []
+        # response_body = Selector(response=response)
+        print(u"----------2-----------")
+        print(response.text)
+        web_title = response.xpath('//title/text()').extract()
+        if web_title == []:
+            return
+        web_title = web_title[0].strip()
+        web_topic = response.xpath('//div[@class="house-title"]/h1[@class="c_333 f20"]/text()').extract()[0]
+        web_public_time = response.xpath('//p[@class="house-update-info c_888 f12"]/text()').extract()[
+            0]  # '发布时间'/html/body/div[5]/div[1]/p
+        web_visit = response.xpath('//em[@id="totalcount"]/text()').extract()[0]  # '网页浏览量'
+        web_publisher = None  # '发布者'
+        identify_info = None  # '认证信息'
+        company_info = None  # '企业(或个人)信息'
+        web_pub_type = None  # '发布来源：0为未知，1为个人房源，2为经纪人房源'
+        house_desc = None  # '房源描述'
+        house_size = None  # '房屋面积：单位平方米'
+        leasehold = None  # '租赁方式：1为整租，2为合租'
+        bedroom_count = None  # '卧室数量'
+        living_room_count = None  # '客厅数量'
+        toilet_count = None  # '卫生间数量'
+        province = None  # '位置：省'
+        city = None  # '位置：市'
+        house_estate = None  # '小区'
+        address = None  # '详细地址'
+        facility = None  # '房屋配套设施'
+        bright_spot = None  # '房屋亮点'
+        print(web_title)
+        print(web_topic)
+        print(web_public_time)
+        print(web_visit)
+        print(web_publisher)
+        print(identify_info)
+        print(company_info)
+        print(web_pub_type)
+        print(house_desc)
+        print(house_size)
+        print(leasehold)
+        print(bedroom_count)
+        print(living_room_count)
+        print(toilet_count)
+        print(province)
+        print(city)
+        print(house_estate)
+        print(address)
+        print(facility)
+        print(bright_spot)
+        print(u"---------2------------")
+
+    # def chuzu_parse(self,response):
+    #     logger.info(u">>> deal with First <<<")
+
+    def drop_parse(self, response):
+        logger.info(u">>> Drop URL <<<")
+        logger.info(u"Drop Url:%s" % response.url)
+
+        # def parse_start_url(self, response):
+        #     logger.info(u">>> Start Engine <<<")
         provinceList = {
             "安徽": "A", "福建": "F", "广东": "G", "广西": "G", "贵州": "G",
             "甘肃": "G", "海南": "H", "河南": "H", "黑龙江": "H", "湖北": "H",
@@ -311,14 +376,10 @@ class Data58Spider(CrawlSpider):
                 "墨尔本": "glmelbourne", "其他海外城市": "city"
             }
         }
-        response_body = Selector(response=response)
-        print(response.body.decode("utf-8"))
-        print(response_body.xpath('//script/@src'))
-        hot_url = response_body.xpath('//a/@href')
-        recommend_url = response_body.xpath('//*[@id="content-box"]/div[1]/div/div[2]/a[9]')
-        content_url = response_body.css('.content-province')
-        print("---------------------")
-        print(hot_url)
-        print(recommend_url)
-        print(content_url)
-        print("---------------------")
+
+        # for i, j in independentCityList:
+        #     logger.info("城市：",i,"代号：", j)
+        #     url = "http://%s.58.com/chuzu/" % j.split('|')[0]
+        #     yield Request(url)
+
+        # return Request("http://bj.58.com/chuzu/", callback=self.chuzu_parse)

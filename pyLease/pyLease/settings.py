@@ -20,7 +20,7 @@ NEWSPIDER_MODULE = 'pyLease.spiders'
 # USER_AGENT = 'pyLease (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -57,7 +57,7 @@ SPIDER_MIDDLEWARES = {
 DOWNLOADER_MIDDLEWARES = {
     'pyLease.middlewares.PyleaseDownloaderMiddleware': 543,
     'pyLease.middlewares.PylenseUserAgentMiddleware': 1,
-    'pyLease.middlewares.PylenseProxyMiddleware': 3,
+    # 'pyLease.middlewares.PylenseProxyMiddleware': 3,
 }
 
 # Enable or disable extensions
@@ -104,7 +104,7 @@ LOCAL_LOG_DIR = "./log"
 if not os.path.isdir(LOCAL_LOG_DIR):
     os.makedirs(LOCAL_LOG_DIR)
 
-LOG_FILE = os.path.join(LOCAL_LOG_DIR, "scrapy.log")
+# LOG_FILE = os.path.join(LOCAL_LOG_DIR, "scrapy.log")
 LOG_FORMAT = "%(asctime)s - [%(levelname)s] - [%(name)s] - [%(filename)s|%(module)s|%(lineno)d] - %(message)s"
 LOG_LEVEL = "DEBUG"
 LOG_STDOUT = True
@@ -128,3 +128,5 @@ PROXIES = [
     {'ip_port': '122.142.243.193:8080', 'user_password': None},
     {'ip_port': '61.135.217.7:80', 'user_password': None},
 ]
+
+DUPEFILTER_DEBUG = True
